@@ -11,13 +11,13 @@ Exercises:
 
 from random import *
 from turtle import *
-
 from freegames import path
 
 car = path('car.gif')
 tiles = list(range(32)) * 2
 state = {'mark': None}
 hide = [True] * 64
+tap_count = 0  # Initialize tap count
 
 
 def square(x, y):
@@ -45,8 +45,11 @@ def xy(count):
 
 def tap(x, y):
     """Update mark and hidden tiles based on tap."""
+    global tap_count  # Use the global variable for tap count
     spot = index(x, y)
     mark = state['mark']
+
+    tap_count += 1  # Increment tap count
 
     if mark is None or mark == spot or tiles[mark] != tiles[spot]:
         state['mark'] = spot
@@ -54,6 +57,11 @@ def tap(x, y):
         hide[spot] = False
         hide[mark] = False
         state['mark'] = None
+
+    # Check if all tiles are revealed
+    if all(not h for h in hide):
+        print("All tiles have been revealed!")  # Print in console
+        state['win'] = True  # Set win state
 
 
 def draw():
@@ -77,12 +85,25 @@ def draw():
         color('black')
         write(tiles[mark], font=('Arial', 30, 'normal'))
 
+    # Display tap count
+    up()
+    goto(-200, 210)  # Position for the tap count
+    color('black')
+    write(f'Tap Count: {tap_count}', font=('Arial', 20, 'normal'))
+
+    # Display win message if all tiles are revealed
+    if 'win' in state and state['win']:
+        up()
+        goto(0, 135)  # Position for the win message
+        color('red')
+        write('You Win!', align='center', font=('Arial', 30, 'normal'))
+
     update()
     ontimer(draw, 100)
 
 
 shuffle(tiles)
-setup(420, 420, 370, 0)
+setup(520, 520, 370, 0)
 addshape(car)
 hideturtle()
 tracer(False)
